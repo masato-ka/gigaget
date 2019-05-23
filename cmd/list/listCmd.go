@@ -13,6 +13,7 @@ import (
 type ListCmd struct {
 	category string
 	num      int
+	search   string
 }
 
 func (*ListCmd) Name() string     { return "list" }
@@ -27,10 +28,12 @@ func (p *ListCmd) SetFlags(f *flag.FlagSet) {
 
 	f.StringVar(&p.category, "category", "", "specify category")
 	f.IntVar(&p.num, "num", 40, "list size")
+	f.StringVar(&p.search, "search", "", "search keyword")
 	//f.BoolVar(&p.capitalize, "capitalize", false, "capitalize output")
 }
 
 func (p *ListCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interface{}) subcommands.ExitStatus {
+
 	id := util.GetCategory(p.category)
 	url := "https://gigazine.net/news/" + id
 	if p.category == "" {
@@ -44,8 +47,6 @@ func (p *ListCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interface{}) 
 
 	defer resp.Body.Close()
 	articles := util.ArticleParse(resp.Body, p.num)
-
-	//return articles
 
 	for i, a := range articles {
 		fmt.Printf("%d : %s - %s  (%s)\n", i+1, a.Data, a.Title, a.Category)
